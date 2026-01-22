@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8
+    container_name: talkx-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secure_password
+      MYSQL_DATABASE: talkx
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./talkx.sql:/docker-entrypoint-initdb.d/init.sql:ro
+  app:
+    build: .
+    container_name: talkx-app
+    restart: always
+    ports:
+      - "8086:8086"
+      - "8884:8884"
+    volumes:
+      - ./application.yml:/talkx/conf/application.yml:ro
+      - ./logback-spring.xml:/talkx/conf/logback-spring.xml:ro
+    depends_on:
+      - db
+volumes:
+  db_data:
